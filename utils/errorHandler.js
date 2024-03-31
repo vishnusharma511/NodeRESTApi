@@ -6,4 +6,22 @@ const generateErrorMessage = (errors) => {
     return errorMessages;
 };
 
-module.exports = { generateErrorMessage };
+const handleServerError = (res, err) => {
+    console.error(err);
+    if (res.headersSent) {
+        return res.end();
+    }
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
+        return res.status(404).json({ message: 'Invalid ObjectId' });
+    }
+    return res.status(500).json({ message: 'Internal Server Error' });
+};
+
+
+const handleNotFoundError = (res, data, message) => {
+    if (!data) {
+        return res.status(404).json({ message: message });
+    }
+};
+
+module.exports = { generateErrorMessage, handleServerError, handleNotFoundError };
