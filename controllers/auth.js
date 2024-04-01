@@ -9,13 +9,19 @@ const {
 
 async function register(req, res) {
   try {
-    const { name, email, mobile, password } = req.body;
+    const { name, email, mobile, password, role } = req.body;
     if (typeof password !== "string") {
       return sendResponse(res, 400, null, "Password must be a string");
     }
-    await validateUser({ name, email, mobile, password });
+    await validateUser({ name, email, mobile, password, role });
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, mobile, password: hashedPassword });
+    const newUser = new User({
+      name,
+      email,
+      mobile,
+      password: hashedPassword,
+      role,
+    });
     await newUser.save();
     sendResponse(res, 201, null, "User registered successfully");
   } catch (err) {
@@ -34,7 +40,7 @@ async function login(req, res) {
     if (!isValidPassword) {
       return sendResponse(res, 401, null, "Invalid password");
     }
-    const token = generateToken({ userId: user._id });
+    const token = generateToken({ userId: user._id, role:user.role });
     sendResponse(res, 200, { token }, "Login successful");
   } catch (error) {
     sendResponse(res, 500, null, "Login failed");

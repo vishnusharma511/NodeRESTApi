@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
     mobile: {
         type: Number,
         required: false
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
     }
 }, { timestamps: true });
 
@@ -27,7 +32,8 @@ const userValidationSchema = yup.object().shape({
     name: yup.string().required('Name is required'),
     email: yup.string().email('Invalid email format').required('Email is required'),
     password: yup.string().required('Password is required'),
-    mobile: yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile number is required')
+    mobile: yup.string().matches(/^[0-9]{10}$/, 'Mobile number must be 10 digits').required('Mobile number is required'),
+    role: yup.string().oneOf(['user', 'admin']).required('Role is required')
 });
 
 module.exports = { User, userValidationSchema };

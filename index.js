@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 
 const connectToMongoDB = require("./config/database");
 
+const { authenticateToken } = require('./middleware/authenticateToken');
+const { authorize } = require('./middleware/authorize');
+
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const todoRouter = require("./routes/todo");
@@ -18,8 +21,8 @@ app.use(bodyParser.json());
 
 
 app.use("/auth", authRouter);
-app.use("/users", userRouter);
-app.use("/todos", todoRouter);
+app.use("/users",authenticateToken, authorize('admin'), userRouter);
+app.use("/todos",authenticateToken, todoRouter);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () =>

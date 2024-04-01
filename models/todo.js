@@ -30,4 +30,20 @@ const todoValidationSchema = yup.object().shape({
     createdBy: yup.string().required('Created by is required')
 });
 
-module.exports = { Todo, todoValidationSchema };
+async function paginateTodos(page, limit) {
+    const skip = (page - 1) * limit;
+    const todos = await Todo.find().skip(skip).limit(limit);
+    const totalCount = await Todo.countDocuments();
+    return { todos, totalCount };
+}
+
+function createPaginationMetadata(page, limit, totalCount, totalPages) {
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+    const nextPage = hasNextPage ? `/todos?page=${page + 1}&limit=${limit}` : null;
+    const prevPage = hasPrevPage ? `/todos?page=${page - 1}&limit=${limit}` : null;
+    return { totalCount, totalPages, currentPage: page, nextPage, prevPage };
+  }
+
+module.exports = { Todo, todoValidationSchema, paginateTodos, createPaginationMetadata };
+

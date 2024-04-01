@@ -1,15 +1,23 @@
-const { Todo, todoValidationSchema } = require("../models/todo");
+const { Todo, todoValidationSchema, paginateTodos, createPaginationMetadata } = require("../models/todo");
 const { generateErrorMessage, handleServerError, handleNotFoundError } = require("../utils/errorHandler");
 const { sendResponse } = require("../utils/responseHandler");
 
 async function getAllTodos(req, res) {
   try {
-    const todos = await Todo.find();
-    sendResponse(res, 200, todos, "Todos list");
+      const { page = 1, limit = 10 } = req.query;
+
+      const { todos, totalCount } = await paginateTodos(parseInt(page), parseInt(limit));
+
+      const totalPages = Math.ceil(totalCount / limit);
+      const pagination = createPaginationMetadata(page, limit, totalCount, totalPages);
+
+      sendResponse(res, 200, { todos, pagination }, "Todos list");
   } catch (err) {
-    handleServerError(res, err);
+      handleServerError(res, err);
   }
 }
+
+
 
 async function createTodo(req, res) {
   try {
