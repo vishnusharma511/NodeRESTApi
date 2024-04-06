@@ -4,6 +4,7 @@ require("dotenv").config();
 const bodyParser = require('body-parser');
 
 const connectToMongoDB = require("./config/database");
+const config = require("./config/config");
 
 const { authenticateToken } = require('./middleware/authenticateToken');
 const { authorize } = require('./middleware/authorize');
@@ -24,7 +25,7 @@ app.use("/auth", authRouter);
 app.use("/users",authenticateToken, authorize('admin'), userRouter);
 app.use("/todos",authenticateToken, todoRouter);
 
-const port = process.env.PORT || 8000;
+const port = config.get('port');
 app.listen(port, () =>
   console.log(`Server is listening on http://localhost:${port}`)
 );

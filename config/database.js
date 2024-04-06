@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+const config = require("./config");
 
 function connectToMongoDB() {
-  const uri = process.env.MONGODB_URI;
+  const uri = config.get('mongoDb');
 
   mongoose
     .connect(uri)
